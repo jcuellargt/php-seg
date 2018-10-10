@@ -13,29 +13,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Try it!</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-  </head>
-  <body>
-    <h1>Please Login<h1>
-    <div class="navbar navbar-default">
-      <div class="container">
-        <div class="navbar-header">
-          <div class="navbar-brand">Bookshelf</div>
-        </div>
-        <ul class="nav navbar-nav">
-          <li><a href="/books">Books</a></li>
-        </ul>
-      </div>
+
+{% extends "base.html.twig" %}
+
+{% block content %}
+
+<h3>Try it !!!!</h3>
+<a href="/books/add" class="btn btn-success btn-sm">
+  <i class="glyphicon glyphicon-plus"></i>
+  Add book
+</a>
+
+{# [START book_list] #}
+{% for book in books %}
+<div class="media">
+  <a href="/books/{{book.id}}">
+    <div class="media-left">
+      <img src="http://placekitten.com/g/128/192">
     </div>
-    <div class="container">
-      {% block content %}{% endblock %}
+    <div class="media-body">
+      <h4>{{book.title}}</h4>
+      <p>{{book.author}}</p>
     </div>
-    {{user}}
-  </body>
-</html>
+  </a>
+</div>
+{% else %}
+<p>No books found</p>
+{% endfor %}
+{# [END book_list] #}
+
+{% if next_page_token %}
+<nav>
+  <ul class="pager">
+    <li><a href="?page_token={{next_page_token}}">More</a></li>
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

@@ -35,10 +35,13 @@ app->get('/index/', function (Request $request) use ($app) {
     $model = $app['bookshelf.model'];
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
-    //$token = $request->query->get('page_token');
-    //$bookList = $model->listBooks($app['bookshelf.page_size'], $token);
+    $token = $request->query->get('page_token');
+    $bookList = $model->listBooks($app['bookshelf.page_size'], $token);
 
-    return $twig->render('index.html.twig', []);
+    return $twig->render('index.html.twig', array(
+        'books' => $bookList['books'],
+        'next_page_token' => $bookList['cursor'],
+    ));
 });
 
 
