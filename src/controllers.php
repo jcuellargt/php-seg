@@ -30,7 +30,7 @@ $app->get('/', function (Request $request) use ($app) {
 });
 
 // [START index]
-app->get('/index/', function (Request $request) use ($app) {
+$app->get('/index/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['bookshelf.model'];
     /** @var Twig_Environment $twig */
@@ -43,8 +43,9 @@ app->get('/index/', function (Request $request) use ($app) {
         'next_page_token' => $bookList['cursor'],
     ));
 });
+// [END index]
 
-
+// [START books]
 $app->get('/books/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['bookshelf.model'];
@@ -58,7 +59,7 @@ $app->get('/books/', function (Request $request) use ($app) {
         'next_page_token' => $bookList['cursor'],
     ));
 });
-// [END index]
+// [END books]
 
 // [START add]
 $app->get('/books/add', function () use ($app) {
