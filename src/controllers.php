@@ -23,7 +23,6 @@ namespace Google\Cloud\Samples\Bookshelf;
  */
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Google\Cloud\Samples\Bookshelf\DataModel\DataModelInterface;
 
 $app->get('/', function (Request $request) use ($app) {
@@ -31,7 +30,7 @@ $app->get('/', function (Request $request) use ($app) {
 });
 
 // [START index]
-$app->get('/index/', function (Request $request, AuthenticationUtils $authenticationUtils) use ($app) {
+$app->get('/index/', function (Request $request) use ($app) {
     $twig = $app['twig'];
     return $twig->render('index.html.twig', array(
         'last_username' => 'hello',
