@@ -66,8 +66,11 @@ class SqlUserDataModel implements UserDataModelInterface
         $statement = $pdo->prepare('SELECT r.role_name FROM roles r inner join usuario_role ur on r.id=ur.role_id WHERE ur.user_id = :userId');
         $statement->bindValue('userId', $userId, PDO::PARAM_STR);
         $statement->execute();
-
-        return $statement->fetch(PDO::FETCH_ASSOC);
+        $rows = array();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            array_push($rows, $row['role_name']);
+        }
+        return $rows;
     }
 
 
