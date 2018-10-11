@@ -44,6 +44,10 @@ $config = getenv('BOOKSHELF_CONFIG') ?:
 
 $app['config'] = Yaml::parse(file_get_contents($config));
 
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// = = = > USER
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 $app['user.model'] = function ($app) {
     // Data Model
     $config = $app['config'];
@@ -61,6 +65,31 @@ $app['user.model'] = function ($app) {
         $config['cloudsql_password']
     );
 };
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// = = = > EMPLOYEE
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+$app['employee.model'] = function ($app) {
+    // Data Model
+    $config = $app['config'];
+    if (empty($config['bookshelf_backend'])) {
+        throw new \DomainException('"bookshelf_backend" must be set in bookshelf config');
+    }
+    $postgres_dsn = SqlEmployeeDataModel::getPostgresDsn(
+        $config['cloudsql_database_name'],
+        $config['cloudsql_port'],
+        getenv('GAE_INSTANCE') ? $config['cloudsql_connection_name'] : null
+    );
+    return new SqlEmployeeDataModel(
+        $postgres_dsn,
+        $config['cloudsql_user'],
+        $config['cloudsql_password']
+    );
+};
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
 // determine the datamodel backend using the app configuration
 $app['bookshelf.model'] = function ($app) {
