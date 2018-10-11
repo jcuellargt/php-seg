@@ -25,6 +25,7 @@ use Google\Cloud\Samples\Bookshelf\DataModel\SqlUserDataModel;
 use Google\Cloud\Samples\Bookshelf\DataModel\Datastore;
 use Google\Cloud\Samples\Bookshelf\DataModel\MongoDb;
 use Silex\Application;
+use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Symfony\Component\Yaml\Yaml;
 
@@ -47,6 +48,17 @@ $app['config'] = Yaml::parse(file_get_contents($config));
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 // = = = > USER
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// register the session handler
+// [START session]
+$app->register(new SessionServiceProvider);
+// fall back on PHP's "session.save_handler" for session storage
+$app['session.storage.handler'] = null;
+$app['user'] = function ($app) {
+    /** @var Symfony\Component\HttpFoundation\Session\Session $session */
+    $session = $app['session'];
+    return $session->has('user') ? $session->get('user') : null;
+};
+// [END session]
 
 $app['user.model'] = function ($app) {
     // Data Model
@@ -90,6 +102,29 @@ $app['employee.model'] = function ($app) {
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// = = = > PROVIDER
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+$app['provider.model'] = function ($app) {
+    // Data Model
+    $config = $app['config'];
+    if (empty($config['bookshelf_backend'])) {
+        throw new \DomainException('"bookshelf_backend" must be set in bookshelf config');
+    }
+    $postgres_dsn = SqlProviderDataModel::getPostgresDsn(
+        $config['cloudsql_database_name'],
+        $config['cloudsql_port'],
+        getenv('GAE_INSTANCE') ? $config['cloudsql_connection_name'] : null
+    );
+    return new SqlProviderDataModel(
+        $postgres_dsn,
+        $config['cloudsql_user'],
+        $config['cloudsql_password']
+    );
+};
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 // determine the datamodel backend using the app configuration
 $app['bookshelf.model'] = function ($app) {

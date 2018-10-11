@@ -45,20 +45,43 @@ $app->post('/index/', function (Request $request) use ($app) {
     $twig = $app['twig'];
     $user = $request->request->all();
     $email = $user['_email'];
-    $user = $model->readByEmail($email);
-    if (!$user) {
+    $userInfo = $model->readByEmail($email);
+    $session = $app['session'];
+    if (!$userInfo) {
       error_log("user not found",0);
       return $twig->render('index.html.twig', array(
           'last_username' => 'hello',
           'error'         => 'Invalid Login'
       ));
     }
+
+    $userId = $userInfo['id'];
+    error_log("User ID ".$userId,0);
+    $role = $model->readRoles($userId);
+
+    foreach ($role as $valor) {
+      error_log("Valor".$valor,0);
+    }
+    $session->set('user', [
+            'id'      => $userInfo['id'],
+            'email'   => $userInfo['email'],
+            'role'    => $role
+        ]);
+
     error_log(" User found !  ",0);
 
     return $app->redirect("/books/");
 });
-
 // [END login]
+
+# [START logout]
+$app->get('/logout', function () use ($app) {
+    /** @var Symfony\Component\HttpFoundation\Session\Session $session */
+    $session = $app['session'];
+    $session->remove('user');
+    return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+})->bind('logout');
+# [END logout]
 
 // [START books]
 $app->get('/books/', function (Request $request) use ($app) {

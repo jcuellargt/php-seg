@@ -16,26 +16,92 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Autenticacion - PHP on Google Cloud Platform</title>
+    <title>UMG APP Security - PHP on Google Cloud Platform</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <style>
+    .alert {
+        padding: 20px;
+        background-color: #f44336;
+        color: white;
+        opacity: 1;
+        transition: opacity 0.6s;
+        margin-bottom: 15px;
+    }
+
+    .alert.success {background-color: #4CAF50;}
+    .alert.info {background-color: #2196F3;}
+    .alert.warning {background-color: #ff9800;}
+
+    .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .closebtn:hover {
+        color: black;
+    }
+    </style>
+
   </head>
   <body>
+
     <div class="navbar navbar-default">
       <div class="container">
         <div class="navbar-header">
-          <div class="navbar-brand">Seguridad-UMG</div>
+          <div class="navbar-brand">UMG APP Security</div>
         </div>
-        <ul class="nav navbar-nav">
-          <li><a href="/books">Books</a></li>
-          <li><a href="/employees">Empleados</a></li>
-        </ul>
+
+        {% if app.user %}
+          <ul class="nav navbar-nav">
+            <li><a href="/books">Books</a></li>
+          </ul>
+          {% if 'RRHH' in app.user.role %}
+            <ul class="nav navbar-nav">
+              <li><a href="/employees">Empleados</a></li>
+            </ul>
+          {% endif %}
+          {% if 'COMPRAS' in app.user.role %}
+            <ul class="nav navbar-nav">
+              <li><a href="/providers">Proveedores</a></li>
+            </ul>
+          {% endif %}
+        {% endif %}
+        <p class="navbar-text navbar-right">
+            {# [START login] #}
+            {% if app.user %}
+              <span>
+                {{ app.user.email }} &nbsp;
+                <a href="/logout">(logout)</a>
+              </span>
+            {% endif %}
+            {# [END login] #}
+        </p>
       </div>
     </div>
+
     <div class="container">
       {% block content %}{% endblock %}
     </div>
     {{user}}
+    <script>
+var close = document.getElementsByClassName("closebtn");
+var i;
+
+for (i = 0; i < close.length; i++) {
+    close[i].onclick = function(){
+        var div = this.parentElement;
+        div.style.opacity = "0";
+        setTimeout(function(){ div.style.display = "none"; }, 600);
+    }
+}
+</script>
   </body>
 </html>
