@@ -59,8 +59,14 @@ $app->post('/index/', function (Request $request) use ($app) {
     error_log("User ID ".$userId,0);
     $role = $model->readRoles($userId);
 
-    foreach ($role as $valor) {
-      error_log("Valor".$valor,0);
+    error_log($userInfo['password']);
+    error_log($user['_password']);
+    if($userInfo['password']!=$user['_password']){
+      error_log("invalid password",0);
+      return $twig->render('index.html.twig', array(
+          'last_username' => 'hello',
+          'error'         => 'Invalid Login'
+      ));
     }
     $session->set('user', [
             'id'      => $userInfo['id'],

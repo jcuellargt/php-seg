@@ -58,9 +58,7 @@
         <div class="navbar-header">
           <div class="navbar-brand">UMG APP Security</div>
         </div>
-
-        {% if app.user %}
-            {% if 'RRHH' in app.user.role %}
+          {% if 'RRHH' in app.user.role %}
             <ul class="nav navbar-nav">
               <li><a href="/employees/">Empleados</a></li>
             </ul>
@@ -69,7 +67,6 @@
             <ul class="nav navbar-nav">
               <li><a href="/providers/">Proveedores</a></li>
             </ul>
-          {% endif %}
         {% endif %}
         <p class="navbar-text navbar-right">
             {# [START login] #}
