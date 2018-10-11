@@ -301,7 +301,7 @@ $app->get('/providers/', function (Request $request) use ($app) {
     $providerList = $model->listProviders($app['bookshelf.page_size'], $token);
 
     return $twig->render('providers_list.html.twig', array(
-        'provider' => $providerList['providers'],
+        'providers' => $providerList['providers'],
         'next_page_token' => $providerList['cursor'],
     ));
 });
@@ -322,7 +322,7 @@ $app->post('/providers/add', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['provider.model'];
     $provider = $request->request->all();
-    $id = $model->createProvider($provider);
+    $id = $model->create($provider);
 
     return $app->redirect("/providers/$id");
 });
@@ -347,7 +347,7 @@ $app->get('/providers/{id}', function ($id) use ($app) {
 $app->get('/providers/{id}/edit', function ($id) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['provider.model'];
-    $provider = $model->readProvider($id);
+    $provider = $model->read($id);
     if (!$provider) {
         return new Response('', Response::HTTP_NOT_FOUND);
     }
@@ -365,10 +365,10 @@ $app->post('/providers/{id}/edit', function (Request $request, $id) use ($app) {
     $provider['id'] = $id;
     /** @var DataModelInterface $model */
     $model = $app['provider.model'];
-    if (!$model->readProvider($id)) {
+    if (!$model->read($id)) {
         return new Response('', Response::HTTP_NOT_FOUND);
     }
-    if ($model->updateProvider($provider)) {
+    if ($model->update($provider)) {
         return $app->redirect("/providers/$id");
     }
 
@@ -380,9 +380,9 @@ $app->post('/providers/{id}/edit', function (Request $request, $id) use ($app) {
 $app->post('/providers/{id}/delete', function ($id) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['provider.model'];
-    $provider = $model->readProvider($id);
+    $provider = $model->read($id);
     if ($provider) {
-        $model->deleteProvider($id);
+        $model->delete($id);
 
         return $app->redirect('/providers/', Response::HTTP_SEE_OTHER);
     }

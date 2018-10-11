@@ -41,7 +41,7 @@ class SqlProviderDataModel implements ProviderDataModelInterface
         $columns = array(
             'id serial PRIMARY KEY ',
             'organizacion VARCHAR(200)',
-            'nomnbre VARCHAR(200)',
+            'nombre VARCHAR(200)',
             'apellidos VARCHAR(200)',
             'email text',
         );

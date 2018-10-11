@@ -27,10 +27,7 @@
 {# [START provider_list] #}
 {% for provider in providers %}
 <div class="media">
-  <a href="/provider/{{provider.id}}">
-    <div class="media-left">
-      <img src="http://placekitten.com/g/128/192">
-    </div>
+  <a href="/providers/{{provider.id}}">
     <div class="media-body">
       <h4>{{provider.organizacion}}</h4>
       <p>{{provider.email}}</p>

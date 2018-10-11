@@ -36,10 +36,10 @@
 <div class="media">
   <div class="media-body">
     <h4 class="book-title">
-      {{provider.Organizacion}}
-      <small>{{provider.email}}</small>
+      {{provider.organizacion}}
     </h4>
-    <h5 class="book-author">By {{provider.nombre|default('Unknown', True)} {provider.apellido}}</h5>
+    <small>Contacto: {{provider.email}}</small>
+    <h5 class="book-author">{{provider.nombre}} {{provider.apellidos}}</h5>
   </div>
 </div>
 {# [END provider_details] #}
