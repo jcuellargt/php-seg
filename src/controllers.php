@@ -39,6 +39,23 @@ $app->get('/index/', function (Request $request) use ($app) {
 });
 // [END index]
 
+// [START login]
+$app->post('/index/', function (Request $request) use ($app) {
+    $model = $app['user.model'];
+    $user = $request->request->all();
+    $email = $user['email'];
+    $user = $model->readByEmail('abc');
+    if (!$user) {
+        error_log(" User not found !  ",0);
+        return new Response('Login required', Response::HTTP_BAD_REQUEST);
+    }
+    error_log(" User found !  ",0);
+
+    return $app->redirect("/books/");
+});
+
+// [END login]
+
 // [START books]
 $app->get('/books/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
