@@ -167,7 +167,7 @@ $app->post('/books/{id}/delete', function ($id) use ($app) {
 // [START employees]
 $app->get('/employees/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['employee.model'];
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
     $token = $request->query->get('page_token');
