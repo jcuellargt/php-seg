@@ -60,17 +60,14 @@
         </div>
 
         {% if app.user %}
-          <ul class="nav navbar-nav">
-            <li><a href="/books">Books</a></li>
-          </ul>
-          {% if 'RRHH' in app.user.role %}
+            {% if 'RRHH' in app.user.role %}
             <ul class="nav navbar-nav">
-              <li><a href="/employees">Empleados</a></li>
+              <li><a href="/employees/">Empleados</a></li>
             </ul>
           {% endif %}
           {% if 'COMPRAS' in app.user.role %}
             <ul class="nav navbar-nav">
-              <li><a href="/providers">Proveedores</a></li>
+              <li><a href="/providers/">Proveedores</a></li>
             </ul>
           {% endif %}
         {% endif %}

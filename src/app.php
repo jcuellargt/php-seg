@@ -22,6 +22,8 @@
  */
 use Google\Cloud\Samples\Bookshelf\DataModel\Sql;
 use Google\Cloud\Samples\Bookshelf\DataModel\SqlUserDataModel;
+use Google\Cloud\Samples\Bookshelf\DataModel\SqlEmployeeDataModel;
+use Google\Cloud\Samples\Bookshelf\DataModel\SqlProviderDataModel;
 use Google\Cloud\Samples\Bookshelf\DataModel\Datastore;
 use Google\Cloud\Samples\Bookshelf\DataModel\MongoDb;
 use Silex\Application;

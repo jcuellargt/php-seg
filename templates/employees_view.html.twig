@@ -37,10 +37,10 @@
   <div class="media-body">
     <h4 class="book-title">
       {{employee.primer_nombre}}
-      <small>{{employee.fecha_nacimiento}}</small>
     </h4>
-    <h5 class="book-author">By {{employee.primer_apellido|default('Unknown', True)} {employee.segundo_apellido}}</h5>
+    <h5>{{employee.primer_apellido|default('Unknown', True)}}</h5>
     <p class="book-description">Labora desde: {{employee.fecha_ingreso}}</p>
+    <p class="book-description">Fecha Nacimiento: {{employee.fecha_nacimiento}}</p>
   </div>
 </div>
 {# [END employee_details] #}

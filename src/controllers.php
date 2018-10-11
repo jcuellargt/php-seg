@@ -216,9 +216,9 @@ $app->get('/employees/add', function () use ($app) {
 
 $app->post('/employees/add', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['employee.model'];
     $employee = $request->request->all();
-    $id = $model->createEmployee($employee);
+    $id = $model->create($employee);
 
     return $app->redirect("/employees/$id");
 });
@@ -227,7 +227,7 @@ $app->post('/employees/add', function (Request $request) use ($app) {
 // [START show]
 $app->get('/employees/{id}', function ($id) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['employee.model'];
     $employee = $model->read($id);
     if (!$employee) {
         return new Response('', Response::HTTP_NOT_FOUND);
@@ -242,8 +242,8 @@ $app->get('/employees/{id}', function ($id) use ($app) {
 // [START edit]
 $app->get('/employees/{id}/edit', function ($id) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
-    $employee = $model->readEmployee($id);
+    $model = $app['employee.model'];
+    $employee = $model->read($id);
     if (!$employee) {
         return new Response('', Response::HTTP_NOT_FOUND);
     }
@@ -260,11 +260,11 @@ $app->post('/employees/{id}/edit', function (Request $request, $id) use ($app) {
     $employee = $request->request->all();
     $employee['id'] = $id;
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
-    if (!$model->readEmployee($id)) {
+    $model = $app['employee.model'];
+    if (!$model->read($id)) {
         return new Response('', Response::HTTP_NOT_FOUND);
     }
-    if ($model->updateEmployee($employee)) {
+    if ($model->update($employee)) {
         return $app->redirect("/employees/$id");
     }
 
@@ -275,10 +275,10 @@ $app->post('/employees/{id}/edit', function (Request $request, $id) use ($app) {
 // [START delete]
 $app->post('/employees/{id}/delete', function ($id) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
-    $employee = $model->readEmployee($id);
+    $model = $app['employee.model'];
+    $employee = $model->read($id);
     if ($employee) {
-        $model->deleteEmployee($id);
+        $model->delete($id);
 
         return $app->redirect('/employees/', Response::HTTP_SEE_OTHER);
     }
@@ -294,7 +294,7 @@ $app->post('/employees/{id}/delete', function ($id) use ($app) {
 // [START providers]
 $app->get('/providers/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['provider.model'];
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
     $token = $request->query->get('page_token');
@@ -320,7 +320,7 @@ $app->get('/providers/add', function () use ($app) {
 
 $app->post('/providers/add', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['provider.model'];
     $provider = $request->request->all();
     $id = $model->createProvider($provider);
 
@@ -331,7 +331,7 @@ $app->post('/providers/add', function (Request $request) use ($app) {
 // [START show]
 $app->get('/providers/{id}', function ($id) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['provider.model'];
     $provider = $model->read($id);
     if (!$provider) {
         return new Response('', Response::HTTP_NOT_FOUND);
@@ -346,7 +346,7 @@ $app->get('/providers/{id}', function ($id) use ($app) {
 // [START edit]
 $app->get('/providers/{id}/edit', function ($id) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['provider.model'];
     $provider = $model->readProvider($id);
     if (!$provider) {
         return new Response('', Response::HTTP_NOT_FOUND);
@@ -364,7 +364,7 @@ $app->post('/providers/{id}/edit', function (Request $request, $id) use ($app) {
     $provider = $request->request->all();
     $provider['id'] = $id;
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['provider.model'];
     if (!$model->readProvider($id)) {
         return new Response('', Response::HTTP_NOT_FOUND);
     }
@@ -379,7 +379,7 @@ $app->post('/providers/{id}/edit', function (Request $request, $id) use ($app) {
 // [START delete]
 $app->post('/providers/{id}/delete', function ($id) use ($app) {
     /** @var DataModelInterface $model */
-    $model = $app['bookshelf.model'];
+    $model = $app['provider.model'];
     $provider = $model->readProvider($id);
     if ($provider) {
         $model->deleteProvider($id);

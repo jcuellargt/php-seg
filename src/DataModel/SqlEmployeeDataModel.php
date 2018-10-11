@@ -32,7 +32,7 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
     /**
      * Creates the SQL empleados table if it doesn't already exist.
      */
-    public function __construct($dsn, $employee, $password)
+    public function __construct($dsn, $user, $password)
     {
         $this->dsn = $dsn;
         $this->user = $user;
@@ -41,7 +41,7 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
         $columns = array(
             'id serial PRIMARY KEY ',
             'primer_nombre VARCHAR(100)',
-            'segundo_nomnbre VARCHAR(100)',
+            'segundo_nombre VARCHAR(100)',
             'primer_apellido VARCHAR(100)',
             'segundo_apellido VARCHAR(100)',
             'fecha_nacimiento date',

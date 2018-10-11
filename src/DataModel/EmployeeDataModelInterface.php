@@ -35,7 +35,7 @@ interface EmployeeDataModelInterface
      *               'cursor' => pass to next call to listBooks() to fetch
      *               more books]
      */
-    public function list($limit = 10, $cursor = null);
+    public function listEmployees($limit = 10, $cursor = null);
 
     /**
      * Creates a new book in the data model.

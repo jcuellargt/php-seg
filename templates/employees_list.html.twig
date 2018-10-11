@@ -27,10 +27,8 @@
 {# [START employee_list] #}
 {% for employee in employees %}
 <div class="media">
-  <a href="/employee/{{employee.id}}">
-    <div class="media-left">
-      <img src="http://placekitten.com/g/128/192">
-    </div>
+  <a href="/employees/{{employee.id}}">
+
     <div class="media-body">
       <h4>{{employee.primer_nombre}}</h4>
       <p>{{employee.primer_apellido}}</p>
