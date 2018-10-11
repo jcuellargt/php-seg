@@ -24,18 +24,14 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Login</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ path('security_login_check') }}">
-                        {% if error %}
-                            <div class="alert alert-danger">
-                                {{ error.messageKey|trans(error.messageData) }}
-                            </div>
-                        {% endif %}
+                    <form class="form-horizontal" role="form" method="POST" >
+
 
                         <div class="form-group">
                             <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="_email" value="{{ last_username }}">
+                                <input id="email" type="email" class="form-control" name="_email">
                             </div>
                         </div>
 
