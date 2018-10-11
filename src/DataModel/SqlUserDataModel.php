@@ -50,11 +50,12 @@ class SqlUserDataModel implements UserDataModelInterface
     }
 
 
-    public function readByEmail($email)
+    public function readByEmail($email, $password)
     {
         $pdo = $this->newConnection();
-        $statement = $pdo->prepare('SELECT * FROM usuarios WHERE email = :email');
+        $statement = $pdo->prepare('SELECT * FROM usuarios WHERE email = lower(:email) and password = crypt(:password,password)' );
         $statement->bindValue('email', $email, PDO::PARAM_STR);
+        $statement->bindValue('password', $password, PDO::PARAM_STR);
         $statement->execute();
 
         return $statement->fetch(PDO::FETCH_ASSOC);

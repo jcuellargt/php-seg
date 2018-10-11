@@ -31,7 +31,7 @@ interface UserDataModelInterface
      * @return mixed An associative array representing the user if found.
      *               Otherwise, a false value.
      */
-    public function readByEmail($email);
+    public function readByEmail($email, $password);
 
     /**
      * Reads the roles that belongs to the user from the data model.

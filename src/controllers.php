@@ -45,7 +45,8 @@ $app->post('/index/', function (Request $request) use ($app) {
     $twig = $app['twig'];
     $user = $request->request->all();
     $email = $user['_email'];
-    $userInfo = $model->readByEmail($email);
+    $password = $user['_password'];
+    $userInfo = $model->readByEmail($email, $password);
     $session = $app['session'];
     if (!$userInfo) {
       error_log("user not found",0);
@@ -58,25 +59,13 @@ $app->post('/index/', function (Request $request) use ($app) {
     $userId = $userInfo['id'];
     error_log("User ID ".$userId,0);
     $role = $model->readRoles($userId);
-
-    error_log($userInfo['password']);
-    error_log($user['_password']);
-    if($userInfo['password']!=$user['_password']){
-      error_log("invalid password",0);
-      return $twig->render('index.html.twig', array(
-          'last_username' => 'hello',
-          'error'         => 'Invalid Login'
-      ));
-    }
     $session->set('user', [
             'id'      => $userInfo['id'],
             'email'   => $userInfo['email'],
             'role'    => $role
         ]);
-
     error_log(" User found !  ",0);
-
-    return $app->redirect("/books/");
+    return $app->redirect("/home/");
 });
 // [END login]
 
@@ -90,6 +79,20 @@ $app->get('/logout', function () use ($app) {
 # [END logout]
 
 // [START books]
+$app->get('/home/', function (Request $request) use ($app) {
+    /** @var DataModelInterface $model */
+    $model = $app['bookshelf.model'];
+    /** @var Twig_Environment $twig */
+    $twig = $app['twig'];
+    $token = $request->query->get('page_token');
+    $bookList = $model->listBooks($app['bookshelf.page_size'], $token);
+
+    return $twig->render('list.html.twig', array(
+        'books' => $bookList['books'],
+        'next_page_token' => $bookList['cursor'],
+    ));
+});
+
 $app->get('/books/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['bookshelf.model'];
@@ -199,6 +202,13 @@ $app->get('/employees/', function (Request $request) use ($app) {
     $model = $app['employee.model'];
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('RRHH',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $token = $request->query->get('page_token');
     $employeeList = $model->listEmployees($app['bookshelf.page_size'], $token);
 
@@ -207,13 +217,20 @@ $app->get('/employees/', function (Request $request) use ($app) {
         'next_page_token' => $employeeList['cursor'],
     ));
 });
+
 // [END employees]
 
 // [START add]
 $app->get('/employees/add', function () use ($app) {
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
-
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('RRHH',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     return $twig->render('employees_form.html.twig', array(
         'action' => 'Add',
         'employee' => array(),
@@ -223,6 +240,13 @@ $app->get('/employees/add', function () use ($app) {
 $app->post('/employees/add', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['employee.model'];
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('RRHH',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $employee = $request->request->all();
     $id = $model->create($employee);
 
@@ -234,6 +258,13 @@ $app->post('/employees/add', function (Request $request) use ($app) {
 $app->get('/employees/{id}', function ($id) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['employee.model'];
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('RRHH',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $employee = $model->read($id);
     if (!$employee) {
         return new Response('', Response::HTTP_NOT_FOUND);
@@ -249,6 +280,13 @@ $app->get('/employees/{id}', function ($id) use ($app) {
 $app->get('/employees/{id}/edit', function ($id) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['employee.model'];
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('RRHH',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $employee = $model->read($id);
     if (!$employee) {
         return new Response('', Response::HTTP_NOT_FOUND);
@@ -265,6 +303,13 @@ $app->get('/employees/{id}/edit', function ($id) use ($app) {
 $app->post('/employees/{id}/edit', function (Request $request, $id) use ($app) {
     $employee = $request->request->all();
     $employee['id'] = $id;
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('RRHH',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     /** @var DataModelInterface $model */
     $model = $app['employee.model'];
     if (!$model->read($id)) {
@@ -281,6 +326,13 @@ $app->post('/employees/{id}/edit', function (Request $request, $id) use ($app) {
 // [START delete]
 $app->post('/employees/{id}/delete', function ($id) use ($app) {
     /** @var DataModelInterface $model */
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('RRHH',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $model = $app['employee.model'];
     $employee = $model->read($id);
     if ($employee) {
@@ -300,6 +352,13 @@ $app->post('/employees/{id}/delete', function ($id) use ($app) {
 // [START providers]
 $app->get('/providers/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('COMPRAS',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $model = $app['provider.model'];
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
@@ -316,6 +375,13 @@ $app->get('/providers/', function (Request $request) use ($app) {
 // [START add]
 $app->get('/providers/add', function () use ($app) {
     /** @var Twig_Environment $twig */
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('COMPRAS',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $twig = $app['twig'];
 
     return $twig->render('providers_form.html.twig', array(
@@ -326,6 +392,13 @@ $app->get('/providers/add', function () use ($app) {
 
 $app->post('/providers/add', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('COMPRAS',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $model = $app['provider.model'];
     $provider = $request->request->all();
     $id = $model->create($provider);
@@ -337,6 +410,13 @@ $app->post('/providers/add', function (Request $request) use ($app) {
 // [START show]
 $app->get('/providers/{id}', function ($id) use ($app) {
     /** @var DataModelInterface $model */
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('COMPRAS',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $model = $app['provider.model'];
     $provider = $model->read($id);
     if (!$provider) {
@@ -352,6 +432,13 @@ $app->get('/providers/{id}', function ($id) use ($app) {
 // [START edit]
 $app->get('/providers/{id}/edit', function ($id) use ($app) {
     /** @var DataModelInterface $model */
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('COMPRAS',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $model = $app['provider.model'];
     $provider = $model->read($id);
     if (!$provider) {
@@ -368,6 +455,13 @@ $app->get('/providers/{id}/edit', function ($id) use ($app) {
 
 $app->post('/providers/{id}/edit', function (Request $request, $id) use ($app) {
     $provider = $request->request->all();
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('COMPRAS',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $provider['id'] = $id;
     /** @var DataModelInterface $model */
     $model = $app['provider.model'];
@@ -385,6 +479,13 @@ $app->post('/providers/{id}/edit', function (Request $request, $id) use ($app) {
 // [START delete]
 $app->post('/providers/{id}/delete', function ($id) use ($app) {
     /** @var DataModelInterface $model */
+    $sessionUser = $app['session']->get('user');
+    if(!$sessionUser) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/']);
+    }
+    if(!in_array('COMPRAS',$sessionUser['role'])) {
+      return new Response('', Response::HTTP_FOUND, ['Location' => '/home/']);
+    }
     $model = $app['provider.model'];
     $provider = $model->read($id);
     if ($provider) {
