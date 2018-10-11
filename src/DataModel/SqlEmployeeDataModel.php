@@ -35,9 +35,25 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
     public function __construct($dsn, $employee, $password)
     {
         $this->dsn = $dsn;
-        $this->employee = $employee;
+        $this->user = $user;
         $this->password = $password;
-        //$pdo = $this->newConnection();
+
+        $columns = array(
+            'id serial PRIMARY KEY ',
+            'primer_nombre VARCHAR(100)',
+            'segundo_nomnbre VARCHAR(100)',
+            'primer_apellido VARCHAR(100)',
+            'segundo_apellido VARCHAR(100)',
+            'fecha_nacimiento date',
+            'fecha_ingreso date',
+        );
+
+        $this->columnNames = array_map(function ($columnDefinition) {
+            return explode(' ', $columnDefinition)[0];
+        }, $columns);
+        $columnText = implode(', ', $columns);
+        $pdo = $this->newConnection();
+        $pdo->query("CREATE TABLE IF NOT EXISTS empleados ($columnText)");
     }
 
     /**
@@ -47,12 +63,7 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
      */
     private function newConnection()
     {
-        error_log("CREATING CONNECTION",0);
-        error_log($this->dsn,0);
-        error_log($this->employee,0);
-        error_log($this->password,0);
-        $pdo = new PDO($this->dsn, $this->employee, $this->password);
-        error_log("PDO CREATED ",0);
+        $pdo = new PDO($this->dsn, $this->user, $this->password);
 
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -76,9 +87,8 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
         }
     }
 
-    public function list($limit = 10, $cursor = null)
+    public function listEmployees($limit = 10, $cursor = null)
     {
-      error_log("Sql.List EMPLOYEES  start! ",0);
         $pdo = $this->newConnection();
         if ($cursor) {
             $query = 'SELECT * FROM empleados WHERE id > :cursor ORDER BY id' .
@@ -103,8 +113,6 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
             $last_row = $row;
         }
 
-        error_log("Sql.List EMPLOYEES  end! ",0);
-
         return array(
             'employees' => $rows,
             'cursor' => $new_cursor,
@@ -113,7 +121,7 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
 
     public function create($employee, $id = null)
     {
-        $this->verify($employee);
+        $this->verifyEmployee($employee);
         if ($id) {
             $employee['id'] = $id;
         }
@@ -133,9 +141,19 @@ class SqlEmployeeDataModel implements EmployeeDataModelInterface
         return $pdo->lastInsertId();
     }
 
+    public function read($id)
+    {
+        $pdo = $this->newConnection();
+        $statement = $pdo->prepare('SELECT * FROM empleados WHERE id = :id');
+        $statement->bindValue('id', $id, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function update($employee)
     {
-        $this->verify($employee);
+        $this->verifyEmployee($employee);
         $pdo = $this->newConnection();
         $assignments = array_map(
             function ($column) {

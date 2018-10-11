@@ -163,7 +163,7 @@ class SqlProviderDataModel implements ProviderDataModelInterface
         $statement = $pdo->prepare($sql);
         $values = array_merge(
             array_fill_keys($this->columnNames, null),
-            $book
+            $provider
         );
         return $statement->execute($values);
     }
