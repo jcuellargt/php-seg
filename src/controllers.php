@@ -33,7 +33,8 @@ $app->get('/', function (Request $request) use ($app) {
 $app->get('/index/', function (Request $request) use ($app) {
     $twig = $app['twig'];
     return $twig->render('index.html.twig', array(
-        'hi' => 'hello'
+        'last_username' => 'hello',
+        'error'         => ''
     ));
 });
 // [END index]
