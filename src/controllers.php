@@ -263,3 +263,107 @@ $app->post('/employees/{id}/delete', function ($id) use ($app) {
     return new Response('', Response::HTTP_NOT_FOUND);
 });
 // [END delete]
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// = = = > PROVIDERS
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+// [START providers]
+$app->get('/providers/', function (Request $request) use ($app) {
+    /** @var DataModelInterface $model */
+    $model = $app['bookshelf.model'];
+    /** @var Twig_Environment $twig */
+    $twig = $app['twig'];
+    $token = $request->query->get('page_token');
+    $providerList = $model->listProviders($app['bookshelf.page_size'], $token);
+
+    return $twig->render('providers_list.html.twig', array(
+        'provider' => $providerList['providers'],
+        'next_page_token' => $providerList['cursor'],
+    ));
+});
+// [END providers]
+
+// [START add]
+$app->get('/providers/add', function () use ($app) {
+    /** @var Twig_Environment $twig */
+    $twig = $app['twig'];
+
+    return $twig->render('providers_form.html.twig', array(
+        'action' => 'Add',
+        'provider' => array(),
+    ));
+});
+
+$app->post('/providers/add', function (Request $request) use ($app) {
+    /** @var DataModelInterface $model */
+    $model = $app['bookshelf.model'];
+    $provider = $request->request->all();
+    $id = $model->createProvider($provider);
+
+    return $app->redirect("/providers/$id");
+});
+// [END add]
+
+// [START show]
+$app->get('/providers/{id}', function ($id) use ($app) {
+    /** @var DataModelInterface $model */
+    $model = $app['bookshelf.model'];
+    $provider = $model->read($id);
+    if (!$provider) {
+        return new Response('', Response::HTTP_NOT_FOUND);
+    }
+    /** @var Twig_Environment $twig */
+    $twig = $app['twig'];
+
+    return $twig->render('providers_view.html.twig', array('provider' => $provider));
+});
+// [END show]
+
+// [START edit]
+$app->get('/providers/{id}/edit', function ($id) use ($app) {
+    /** @var DataModelInterface $model */
+    $model = $app['bookshelf.model'];
+    $provider = $model->readProvider($id);
+    if (!$provider) {
+        return new Response('', Response::HTTP_NOT_FOUND);
+    }
+    /** @var Twig_Environment $twig */
+    $twig = $app['twig'];
+
+    return $twig->render('providers_form.html.twig', array(
+        'action' => 'Edit',
+        'provider' => $provider,
+    ));
+});
+
+$app->post('/providers/{id}/edit', function (Request $request, $id) use ($app) {
+    $provider = $request->request->all();
+    $provider['id'] = $id;
+    /** @var DataModelInterface $model */
+    $model = $app['bookshelf.model'];
+    if (!$model->readProvider($id)) {
+        return new Response('', Response::HTTP_NOT_FOUND);
+    }
+    if ($model->updateProvider($provider)) {
+        return $app->redirect("/providers/$id");
+    }
+
+    return new Response('Could not update Provider');
+});
+// [END edit]
+
+// [START delete]
+$app->post('/providers/{id}/delete', function ($id) use ($app) {
+    /** @var DataModelInterface $model */
+    $model = $app['bookshelf.model'];
+    $provider = $model->readProvider($id);
+    if ($provider) {
+        $model->deleteProvider($id);
+
+        return $app->redirect('/providers/', Response::HTTP_SEE_OTHER);
+    }
+
+    return new Response('', Response::HTTP_NOT_FOUND);
+});
+// [END delete]
