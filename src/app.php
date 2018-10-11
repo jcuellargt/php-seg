@@ -44,6 +44,24 @@ $config = getenv('BOOKSHELF_CONFIG') ?:
 
 $app['config'] = Yaml::parse(file_get_contents($config));
 
+$app['user.model'] = function ($app) {
+    // Data Model
+    $config = $app['config'];
+    if (empty($config['bookshelf_backend'])) {
+        throw new \DomainException('"bookshelf_backend" must be set in bookshelf config');
+    }
+    $postgres_dsn = SqlUserDataModel::getPostgresDsn(
+        $config['cloudsql_database_name'],
+        $config['cloudsql_port'],
+        getenv('GAE_INSTANCE') ? $config['cloudsql_connection_name'] : null
+    );
+    return new SqlUserDataModel(
+        $postgres_dsn,
+        $config['cloudsql_user'],
+        $config['cloudsql_password']
+    );
+};
+
 // determine the datamodel backend using the app configuration
 $app['bookshelf.model'] = function ($app) {
     /** @var array $config */
@@ -92,24 +110,6 @@ $app['bookshelf.model'] = function ($app) {
     }
 };
 
-$app['user.model'] = function ($app) {
-    // Data Model
-    $config = $app['config'];
-    if (empty($config['bookshelf_backend'])) {
-        throw new \DomainException('"bookshelf_backend" must be set in bookshelf config');
-    }
-    $mysql_dsn = SqlUserDataModel::getMysqlDsn(
-        $config['cloudsql_database_name'],
-        $config['cloudsql_port'],
-        getenv('GAE_INSTANCE') ? $config['cloudsql_connection_name'] : null
-    );
-    return new SqlUserDataModel(
-        $mysql_dsn,
-        $config['cloudsql_user'],
-        $config['cloudsql_password']
-    );
-
-};
 
 // Turn on debug locally
 if (in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', 'fe80::1', '::1'])

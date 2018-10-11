@@ -42,12 +42,16 @@ $app->get('/index/', function (Request $request) use ($app) {
 // [START login]
 $app->post('/index/', function (Request $request) use ($app) {
     $model = $app['user.model'];
+    $twig = $app['twig'];
     $user = $request->request->all();
-    $email = $user['email'];
-    $user = $model->readByEmail('abc');
+    $email = $user['_email'];
+    $user = $model->readByEmail($email);
     if (!$user) {
-        error_log(" User not found !  ",0);
-        return new Response('Login required', Response::HTTP_BAD_REQUEST);
+      error_log("user not found",0);
+      return $twig->render('index.html.twig', array(
+          'last_username' => 'hello',
+          'error'         => 'Invalid Login'
+      ));
     }
     error_log(" User found !  ",0);
 

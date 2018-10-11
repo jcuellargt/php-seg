@@ -135,12 +135,8 @@ class SqlUserDataModel implements UserDataModelInterface
 
     public function readByEmail($email)
     {
-        error_log("BEFORE READ BY EMAIL ".$email,0);
-        $pdo = $this->newConnection();
-        error_log("CONNECTION success !",0);
-        $statement = $pdo->prepare('SELECT * FROM usuarios WHERE email = :email');
-        $statement->bindValue('email', $email, PDO::PARAM_STR);
-        $statement->execute();
+        $pdo = new PDO($this->dsn, $this->user, $this->password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
