@@ -25,6 +25,7 @@ use Google\Cloud\Samples\Bookshelf\DataModel\SqlUserDataModel;
 use Google\Cloud\Samples\Bookshelf\DataModel\Datastore;
 use Google\Cloud\Samples\Bookshelf\DataModel\MongoDb;
 use Silex\Application;
+use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Symfony\Component\Yaml\Yaml;
 
@@ -43,6 +44,18 @@ $config = getenv('BOOKSHELF_CONFIG') ?:
     __DIR__ . '/../config/' . 'settings.yml';
 
 $app['config'] = Yaml::parse(file_get_contents($config));
+
+// register the session handler
+// [START session]
+$app->register(new SessionServiceProvider);
+// fall back on PHP's "session.save_handler" for session storage
+$app['session.storage.handler'] = null;
+$app['user'] = function ($app) {
+    /** @var Symfony\Component\HttpFoundation\Session\Session $session */
+    $session = $app['session'];
+    return $session->has('user') ? $session->get('user') : null;
+};
+// [END session]
 
 $app['user.model'] = function ($app) {
     // Data Model

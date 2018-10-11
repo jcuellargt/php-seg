@@ -29,15 +29,11 @@ class SqlUserDataModel implements UserDataModelInterface
     private $user;
     private $password;
 
-    /**
-     * Creates the SQL books table if it doesn't already exist.
-     */
     public function __construct($dsn, $user, $password)
     {
         $this->dsn = $dsn;
         $this->user = $user;
         $this->password = $password;
-        //$pdo = $this->newConnection();
     }
 
     /**
@@ -47,129 +43,33 @@ class SqlUserDataModel implements UserDataModelInterface
      */
     private function newConnection()
     {
-        error_log("CREATING CONNECTION",0);
-        error_log($this->dsn,0);
-        error_log($this->user,0);
-        error_log($this->password,0);
         $pdo = new PDO($this->dsn, $this->user, $this->password);
-        error_log("PDO CREATED ",0);
-
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         return $pdo;
     }
 
-    /**
-     * Throws an exception if $book contains an invalid key.
-     *
-     * @param $book array
-     *
-     * @throws \Exception
-     */
-    private function verifyBook($book)
-    {
-        if ($invalid = array_diff_key($book, array_flip($this->columnNames))) {
-            throw new \Exception(sprintf(
-                'unsupported book properties: "%s"',
-                implode(', ', $invalid)
-            ));
-        }
-    }
-
-    public function listBooks($limit = 10, $cursor = null)
-    {
-      error_log("Sql.List BOOKS  start! ",0);
-        $pdo = $this->newConnection();
-        if ($cursor) {
-            $query = 'SELECT * FROM books WHERE id > :cursor ORDER BY id' .
-                ' LIMIT :limit';
-            $statement = $pdo->prepare($query);
-            $statement->bindValue(':cursor', $cursor, PDO::PARAM_INT);
-        } else {
-            $query = 'SELECT * FROM books ORDER BY id LIMIT :limit';
-            $statement = $pdo->prepare($query);
-        }
-        $statement->bindValue(':limit', $limit + 1, PDO::PARAM_INT);
-        $statement->execute();
-        $rows = array();
-        $last_row = null;
-        $new_cursor = null;
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            if (count($rows) == $limit) {
-                $new_cursor = $last_row['id'];
-                break;
-            }
-            array_push($rows, $row);
-            $last_row = $row;
-        }
-
-        error_log("Sql.List BOOKS  end! ",0);
-
-        return array(
-            'books' => $rows,
-            'cursor' => $new_cursor,
-        );
-    }
-
-    public function create($book, $id = null)
-    {
-        $this->verifyBook($book);
-        if ($id) {
-            $book['id'] = $id;
-        }
-        $pdo = $this->newConnection();
-        $names = array_keys($book);
-        $placeHolders = array_map(function ($key) {
-            return ":$key";
-        }, $names);
-        $sql = sprintf(
-            'INSERT INTO books (%s) VALUES (%s)',
-            implode(', ', $names),
-            implode(', ', $placeHolders)
-        );
-        $statement = $pdo->prepare($sql);
-        $statement->execute($book);
-
-        return $pdo->lastInsertId();
-    }
 
     public function readByEmail($email)
     {
-        $pdo = new PDO($this->dsn, $this->user, $this->password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo = $this->newConnection();
+        $statement = $pdo->prepare('SELECT * FROM usuarios WHERE email = :email');
+        $statement->bindValue('email', $email, PDO::PARAM_STR);
+        $statement->execute();
 
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update($book)
-    {
-        $this->verifyBook($book);
-        $pdo = $this->newConnection();
-        $assignments = array_map(
-            function ($column) {
-                return "$column=:$column";
-            },
-            $this->columnNames
-        );
-        $assignmentString = implode(',', $assignments);
-        $sql = "UPDATE books SET $assignmentString WHERE id = :id";
-        $statement = $pdo->prepare($sql);
-        $values = array_merge(
-            array_fill_keys($this->columnNames, null),
-            $book
-        );
-        return $statement->execute($values);
-    }
-
-    public function delete($id)
+    public function readRoles($userId)
     {
         $pdo = $this->newConnection();
-        $statement = $pdo->prepare('DELETE FROM books WHERE id = :id');
-        $statement->bindValue('id', $id, PDO::PARAM_INT);
+        $statement = $pdo->prepare('SELECT r.role_name FROM roles r inner join usuario_role ur on r.id=ur.role_id WHERE ur.user_id = :userId');
+        $statement->bindValue('userId', $userId, PDO::PARAM_STR);
         $statement->execute();
 
-        return $statement->rowCount();
+        return $statement->fetch(PDO::FETCH_ASSOC);
     }
+
 
     public static function getMysqlDsn($dbName, $port, $connectionName = null)
     {

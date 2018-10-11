@@ -25,6 +25,13 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Login</div>
                 <div class="panel-body">
+                    {% if error %}
+                          <div class="alert warning">
+                            <span class="closebtn">&times;</span>
+                              <strong>Warning!</strong> {{error}}
+                          </div>
+                    {% endif %}
+
                     <form class="form-horizontal" role="form" method="POST" >
 
 
