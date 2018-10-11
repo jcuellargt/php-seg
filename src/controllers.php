@@ -23,7 +23,6 @@ namespace Google\Cloud\Samples\Bookshelf;
  */
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Google\Cloud\Samples\Bookshelf\DataModel\DataModelInterface;
 
 $app->get('/', function (Request $request) use ($app) {
@@ -31,7 +30,7 @@ $app->get('/', function (Request $request) use ($app) {
 });
 
 // [START index]
-$app->get('/index/', function (Request $request, AuthenticationUtils $authenticationUtils) use ($app) {
+$app->get('/index/', function (Request $request) use ($app) {
     $twig = $app['twig'];
     return $twig->render('index.html.twig', array(
         'last_username' => 'hello',
@@ -39,6 +38,23 @@ $app->get('/index/', function (Request $request, AuthenticationUtils $authentica
     ));
 });
 // [END index]
+
+// [START login]
+$app->post('/index/', function (Request $request) use ($app) {
+    $model = $app['user.model'];
+    $user = $request->request->all();
+    $email = $user['email'];
+    $user = $model->readByEmail('abc');
+    if (!$user) {
+        error_log(" User not found !  ",0);
+        return new Response('Login required', Response::HTTP_BAD_REQUEST);
+    }
+    error_log(" User found !  ",0);
+
+    return $app->redirect("/books/");
+});
+
+// [END login]
 
 // [START books]
 $app->get('/books/', function (Request $request) use ($app) {

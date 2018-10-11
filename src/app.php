@@ -21,6 +21,7 @@
  * Follows Silex Skeleton pattern.
  */
 use Google\Cloud\Samples\Bookshelf\DataModel\Sql;
+use Google\Cloud\Samples\Bookshelf\DataModel\SqlUserDataModel;
 use Google\Cloud\Samples\Bookshelf\DataModel\Datastore;
 use Google\Cloud\Samples\Bookshelf\DataModel\MongoDb;
 use Silex\Application;
@@ -89,6 +90,25 @@ $app['bookshelf.model'] = function ($app) {
             throw new \DomainException("Invalid \"bookshelf_backend\" given: $config[bookshelf_backend]. "
                 . "Possible values are mysql, postgres, mongodb, or datastore.");
     }
+};
+
+$app['user.model'] = function ($app) {
+    // Data Model
+    $config = $app['config'];
+    if (empty($config['bookshelf_backend'])) {
+        throw new \DomainException('"bookshelf_backend" must be set in bookshelf config');
+    }
+    $mysql_dsn = SqlUserDataModel::getMysqlDsn(
+        $config['cloudsql_database_name'],
+        $config['cloudsql_port'],
+        getenv('GAE_INSTANCE') ? $config['cloudsql_connection_name'] : null
+    );
+    return new SqlUserDataModel(
+        $mysql_dsn,
+        $config['cloudsql_user'],
+        $config['cloudsql_password']
+    );
+
 };
 
 // Turn on debug locally
