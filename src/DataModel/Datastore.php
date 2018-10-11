@@ -39,6 +39,16 @@ class Datastore implements DataModelInterface
         'created_by_id' => 'string',
     ];
 
+    protected $employee_columns = [
+        'id'                => 'integer',
+        'primer_nombre'     => 'string',
+        'segundo_nombre'    => 'string',
+        'primer_apellido'   => 'string',
+        'segundo_apellido'  => 'string',
+        'fecha_nacimiento'  => 'string',
+        'fecha_ingreso'     => 'string',
+    ];
+
     public function __construct($projectId)
     {
         $this->datasetId = $projectId;
@@ -46,6 +56,10 @@ class Datastore implements DataModelInterface
             'projectId' => $projectId,
         ]);
     }
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// = = = > BOOKS
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     public function listBooks($limit = 10, $cursor = null)
     {
@@ -130,6 +144,98 @@ class Datastore implements DataModelInterface
         if ($invalid = array_diff_key($book, $this->columns)) {
             throw new \InvalidArgumentException(sprintf(
                 'unsupported book properties: "%s"',
+                implode(', ', $invalid)
+            ));
+        }
+    }
+
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// = = = > EMPLOYEES
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+    public function listEmployees($limit = 10, $cursor = null)
+    {
+        $query = $this->datastore->query()
+            ->kind('empleados')
+            ->order('name')
+            ->limit($limit)
+            ->start($cursor);
+
+        $results = $this->datastore->runQuery($query);
+
+        $employees = [];
+        $nextPageCursor = null;
+        foreach ($results as $entity) {
+            $employee = $entity->get();
+            $employee['id'] = $entity->key()->pathEndIdentifier();
+            $employees[] = $employee;
+            $nextPageCursor = $entity->cursor();
+        }
+
+        return [
+            'employees' => $employees,
+            'cursor' => $nextPageCursor,
+        ];
+    }
+
+    public function createEmployee($employee, $key = null)
+    {
+        $this->verifyEmployee($employee);
+
+        $key = $this->datastore->key('empleados');
+        $entity = $this->datastore->entity($key, $employee);
+
+        $this->datastore->insert($entity);
+
+        // return the ID of the created datastore entity
+        return $entity->key()->pathEndIdentifier();
+    }
+
+    public function readEmployee($id)
+    {
+        $key = $this->datastore->key('empleados', $id);
+        $entity = $this->datastore->lookup($key);
+
+        if ($entity) {
+            $employee = $entity->get();
+            $employee['id'] = $id;
+            return $employee;
+        }
+
+        return false;
+    }
+
+    public function updateEmployee($employee)
+    {
+        $this->verifyEmployee($employee);
+
+        if (!isset($employee['id'])) {
+            throw new \InvalidArgumentException('Employee must have an "id" attribute');
+        }
+
+        $transaction = $this->datastore->transaction();
+        $key = $this->datastore->key('empleados', $employee['id']);
+        $task = $transaction->lookup($key);
+        unset($employee['id']);
+        $entity = $this->datastore->entity($key, $employee);
+        $transaction->upsert($entity);
+        $transaction->commit();
+
+        // return the number of updated rows
+        return 1;
+    }
+
+    public function deleteEmployee($id)
+    {
+        $key = $this->datastore->key('empleados', $id);
+        return $this->datastore->delete($key);
+    }
+
+    private function verifyEmployee($employee)
+    {
+        if ($invalid = array_diff_key($employee, $this->employee_columns)) {
+            throw new \InvalidArgumentException(sprintf(
+                'unsupported employee properties: "%s"',
                 implode(', ', $invalid)
             ));
         }

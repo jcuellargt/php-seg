@@ -140,7 +140,10 @@ $app->post('/books/{id}/delete', function ($id) use ($app) {
 });
 // [END delete]
 
-// #########################Employees####################
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// = = = > EMPLOYEES
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 // [START employees]
 $app->get('/employees/', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
@@ -151,8 +154,8 @@ $app->get('/employees/', function (Request $request) use ($app) {
     $employeeList = $model->listEmployees($app['bookshelf.page_size'], $token);
 
     return $twig->render('employees_list.html.twig', array(
-        'employees' => $bookList['employees'],
-        'next_page_token' => $bookList['cursor'],
+        'employees' => $employeeList['employees'],
+        'next_page_token' => $employeeList['cursor'],
     ));
 });
 // [END employees]
@@ -162,7 +165,7 @@ $app->get('/employees/add', function () use ($app) {
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
 
-    return $twig->render('employees.html.twig', array(
+    return $twig->render('employees_form.html.twig', array(
         'action' => 'Add',
         'employee' => array(),
     ));
@@ -172,7 +175,7 @@ $app->post('/employees/add', function (Request $request) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['bookshelf.model'];
     $employee = $request->request->all();
-    $id = $model->create($employee);
+    $id = $model->createEmployee($employee);
 
     return $app->redirect("/employees/$id");
 });
@@ -197,14 +200,14 @@ $app->get('/employees/{id}', function ($id) use ($app) {
 $app->get('/employees/{id}/edit', function ($id) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['bookshelf.model'];
-    $employee = $model->read($id);
+    $employee = $model->readEmployee($id);
     if (!$employee) {
         return new Response('', Response::HTTP_NOT_FOUND);
     }
     /** @var Twig_Environment $twig */
     $twig = $app['twig'];
 
-    return $twig->render('form.html.twig', array(
+    return $twig->render('employees_form.html.twig', array(
         'action' => 'Edit',
         'employee' => $employee,
     ));
@@ -215,10 +218,10 @@ $app->post('/employees/{id}/edit', function (Request $request, $id) use ($app) {
     $employee['id'] = $id;
     /** @var DataModelInterface $model */
     $model = $app['bookshelf.model'];
-    if (!$model->read($id)) {
+    if (!$model->readEmployee($id)) {
         return new Response('', Response::HTTP_NOT_FOUND);
     }
-    if ($model->update($employee)) {
+    if ($model->updateEmployee($employee)) {
         return $app->redirect("/employees/$id");
     }
 
@@ -230,9 +233,9 @@ $app->post('/employees/{id}/edit', function (Request $request, $id) use ($app) {
 $app->post('/employees/{id}/delete', function ($id) use ($app) {
     /** @var DataModelInterface $model */
     $model = $app['bookshelf.model'];
-    $employee = $model->read($id);
+    $employee = $model->readEmployee($id);
     if ($employee) {
-        $model->delete($id);
+        $model->deleteEmployee($id);
 
         return $app->redirect('/employees/', Response::HTTP_SEE_OTHER);
     }
@@ -240,4 +243,3 @@ $app->post('/employees/{id}/delete', function ($id) use ($app) {
     return new Response('', Response::HTTP_NOT_FOUND);
 });
 // [END delete]
-
