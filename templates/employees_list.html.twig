@@ -23,23 +23,27 @@
   <i class="glyphicon glyphicon-plus"></i>
   Agregar Empleado
 </a>
-
+</br></br></br>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+      </tr>
+    </thead>
+    <tbody>
 {# [START employee_list] #}
 {% for employee in employees %}
-<div class="media">
-  <a href="/employees/{{employee.id}}">
-
-    <div class="media-body">
-      <h4>{{employee.primer_nombre}}</h4>
-      <p>{{employee.primer_apellido}}</p>
-    </div>
-  </a>
-</div>
+<tr>
+  <td>  <a href="/employees/{{employee.id}}"> <p>{{employee.primer_nombre}}</p></td>
+  <td><p>{{employee.primer_apellido}}</p></td>
+</tr>
 {% else %}
 <p>No se encontraron empleados</p>
 {% endfor %}
 {# [END employee_list] #}
-
+</tbody>
+</table>
 {% if next_page_token %}
 <nav>
   <ul class="pager">

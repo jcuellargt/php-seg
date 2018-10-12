@@ -36,12 +36,15 @@
     <label for="published_date">Apellidos</label>
     <input type="text" name="apellidos" id="published_date" value="{{provider.apellidos}}" class="form-control"/>
   </div>
-
   <div class="form-group">
-    <label for="description">email</label>
+    <label for="description">Email</label>
     <textarea name="email" id="description" class="form-control">{{provider.email}}</textarea>
   </div>
 
+  <a href="/providers/" class="btn btn-primary btn-sm">
+    <i class="glyphicon glyphicon-arrow-left"></i>
+    Regresar
+  </a>
   <button id="submit" type="submit" class="btn btn-success">Save</button>
 </form>
 

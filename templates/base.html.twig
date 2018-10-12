@@ -55,25 +55,29 @@
 
     <div class="navbar navbar-default">
       <div class="container">
-        <div class="navbar-header">
-          <div class="navbar-brand">UMG APP Security</div>
-        </div>
+        {% if app.user %} 
+        <ul class="nav navbar-nav">
+          <li><a href="/home/" >  <i class="glyphicon glyphicon-home"></i>  UMG APP Security</a></li>
+        </ul>
+         {% endif %}
+        {% if app.user %}
           {% if 'RRHH' in app.user.role %}
             <ul class="nav navbar-nav">
-              <li><a href="/employees/">Empleados</a></li>
+              <li><a href="/employees/"><i class="glyphicon glyphicon-user"></i>  Empleados</a></li>
             </ul>
           {% endif %}
           {% if 'COMPRAS' in app.user.role %}
             <ul class="nav navbar-nav">
-              <li><a href="/providers/">Proveedores</a></li>
+              <li><a href="/providers/"><i class="glyphicon glyphicon-book"></i>  Proveedores</a></li>
             </ul>
+        {% endif %}
         {% endif %}
         <p class="navbar-text navbar-right">
             {# [START login] #}
             {% if app.user %}
               <span>
                 {{ app.user.email }} &nbsp;
-                <a href="/logout">(logout)</a>
+                <a href="/logout"><i class="glyphicon glyphicon-off"></i> (logout)</a>
               </span>
             {% endif %}
             {# [END login] #}

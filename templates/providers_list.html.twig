@@ -23,22 +23,27 @@
   <i class="glyphicon glyphicon-plus"></i>
   Agregar Proveedor
 </a>
-
+</br></br></br>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+      </tr>
+    </thead>
+    <tbody>
 {# [START provider_list] #}
 {% for provider in providers %}
-<div class="media">
-  <a href="/providers/{{provider.id}}">
-    <div class="media-body">
-      <h4>{{provider.organizacion}}</h4>
-      <p>{{provider.email}}</p>
-    </div>
-  </a>
-</div>
+<tr>
+  <td>  <a href="/providers/{{provider.id}}"> <p>{{provider.organizacion}}</p></td>
+  <td><p>{{provider.email}}</p></td>
+</tr>
 {% else %}
 <p>No se encontraron proveedores</p>
 {% endfor %}
 {# [END provider_list] #}
-
+</tbody>
+</table>
 {% if next_page_token %}
 <nav>
   <ul class="pager">
