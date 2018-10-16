@@ -24,21 +24,21 @@
 
   <div class="form-group">
     <label for="title">Organizacion</label>
-    <input type="text" name="organizacion" id="title" value="{{provider.organizacion}}" class="form-control"/>
+    <input type="text" maxlength="50" name="organizacion" id="title" value="{{provider.organizacion}}" class="form-control"/>
   </div>
 
   <div class="form-group">
     <label for="author">Nombre</label>
-    <input type="text" name="nombre" id="author" value="{{provider.nombre}}" class="form-control"/>
+    <input type="text" maxlength="50" name="nombre" id="author" value="{{provider.nombre}}" class="form-control"/>
   </div>
 
   <div class="form-group">
     <label for="published_date">Apellidos</label>
-    <input type="text" name="apellidos" id="published_date" value="{{provider.apellidos}}" class="form-control"/>
+    <input type="text" maxlength="50" name="apellidos" id="published_date" value="{{provider.apellidos}}" class="form-control"/>
   </div>
   <div class="form-group">
     <label for="description">Email</label>
-    <textarea name="email" id="description" class="form-control">{{provider.email}}</textarea>
+    <textarea name="email" maxlength="50" id="description" class="form-control">{{provider.email}}</textarea>
   </div>
 
   <a href="/providers/" class="btn btn-primary btn-sm">

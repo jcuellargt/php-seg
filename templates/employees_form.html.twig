@@ -24,22 +24,22 @@
 
   <div class="form-group">
     <label for="title">Nombres</label>
-    <input type="text" name="primer_nombre" id="title" value="{{employee.primer_nombre}}" class="form-control"/>
+    <input type="text" maxlength="50" name="primer_nombre" id="title" value="{{employee.primer_nombre}}" class="form-control"/>
   </div>
 
   <div class="form-group">
     <label for="author">Apellidos</label>
-    <input type="text" name="primer_apellido" id="author" value="{{employee.primer_apellido}}" class="form-control"/>
+    <input type="text" maxlength="50" name="primer_apellido" id="author" value="{{employee.primer_apellido}}" class="form-control"/>
   </div>
 
   <div class="form-group">
     <label for="published_date">Fecha Nacimiento</label>
-    <input type="text" name="fecha_nacimiento" id="published_date" value="{{employee.fecha_nacimiento}}" class="form-control"/>
+    <input type="text" maxlength="10" name="fecha_nacimiento" id="published_date" value="{{employee.fecha_nacimiento}}" class="form-control"/>
   </div>
 
   <div class="form-group">
     <label for="fecha_ingreso">Fecha Ingreso</label>
-    <input type="text" name="fecha_ingreso" id="published_date" value="{{employee.fecha_ingreso}}" class="form-control"/>
+    <input type="text" maxlength="10" name="fecha_ingreso" id="published_date" value="{{employee.fecha_ingreso}}" class="form-control"/>
   </div>
   <a href="/employees/" class="btn btn-primary btn-sm">
     <i class="glyphicon glyphicon-arrow-left"></i>
