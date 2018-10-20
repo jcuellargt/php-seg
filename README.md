@@ -7,10 +7,6 @@
 ### Seguridad de Aplicaciones
 
 
-* Job Ezequiel Méndez Santizo  |  1293-03-245
-* Miguel Angel de Leon Miranda |
-* Jorge René Cuellar Quijada |
-
 | Nombre                       	| Carne        	|
 |------------------------------	|--------------	|
 | Job Ezequiel Méndez Santizo  	| 1293-03-245  	|
